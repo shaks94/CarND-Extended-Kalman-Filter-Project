@@ -1,6 +1,6 @@
 #include <iostream>
 #include "tools.h"
-
+#include<math.h>
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
@@ -17,19 +17,20 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   */
     VectorXd rmse(4);
     rmse << 0,0,0,0;
+    long estimations_size =estimations.size() ;
     // Check the validity of the following inputs:
     // The estimation vector size should not be zero
-    if(estimations.size() == 0){
+    if(estimations_size == 0){
         cout << "Input is empty" << endl;
         return rmse;
     }
     // The estimation vector size should equal ground truth vector size
-    if(estimations.size() != ground_truth.size()){
+    if(estimations_size != ground_truth.size()){
         cout << "Invalid estimation or ground_truth. Data should have the same size" << endl;
         return rmse;
     }
     // Accumulate squared residuals
-    for(unsigned int i=0; i < estimations.size(); ++i){
+    for(unsigned int i=0; i < estimations_size; ++i){
         VectorXd residual = estimations[i] - ground_truth[i];
         // Coefficient-wise multiplication
         residual = residual.array()*residual.array();
@@ -37,7 +38,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
     }
     
     // Calculate the mean
-    rmse = rmse / estimations.size();
+    rmse = rmse / estimations_size;
     rmse = rmse.array().sqrt();
     cout<<"rms"<<rmse<<endl;
     return rmse;
@@ -53,15 +54,17 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     
     //pre-compute a set of terms to avoid repeated calculation
     float c1 = px*px+py*py;
-    if(fabs(c1) < .00001) {
-        px += .001;
-        py += .001;
-        c1 = px * px + py * py;
-    }
+//    if(fabs(c1) < .00001) {
+//        px += .001;
+//        py += .001;
+//        c1 = px * px + py * py;
+//    }
     float c2 = sqrt(c1);
     float c3 = (c1*c2);
-    
-    //check division by zero
+    if(fabs(c1) < 0.0001){
+        cout << "ERROR - CalculateJacobian () - Division by Zero" << endl;
+        return Hj;
+    }    //check division by zero
 
     
     //compute the Jacobian matrix
