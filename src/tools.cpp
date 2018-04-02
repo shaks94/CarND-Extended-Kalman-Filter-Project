@@ -54,11 +54,12 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
     
     //pre-compute a set of terms to avoid repeated calculation
     float c1 = px*px+py*py;
-//    if(fabs(c1) < .00001) {
-//        px += .001;
-//        py += .001;
-//        c1 = px * px + py * py;
-//    }
+    if(fabs(c1) < .00001) {
+        cout<<"iin for c1";
+        px += .001;
+        py += .001;
+        c1 = px * px + py * py;
+    }
     float c2 = sqrt(c1);
     float c3 = (c1*c2);
     if(fabs(c1) < 0.0001){
